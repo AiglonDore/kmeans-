@@ -1,0 +1,13 @@
+---
+title: "Improved \(K\)-means algorithm"
+author: "Houda Aiboud Benchekroun and Thomas Roiseux"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+\rule{\linewidth}{0.1pt}
+\part{Improved algorithm}
+
+\part{Application to iris data}
+```{r loadiris}
+library(dplyr)
+```
