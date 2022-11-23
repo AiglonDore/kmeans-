@@ -43,14 +43,18 @@ kmeans_update <- function(data, centroids, assignments) {
 
 # Complete algorithm
 
-kmeans <- function(data, k, max_iter = 100) {
+kmeans <- function(data, k, max_iter = NULL) {
     # data is the data set
     # k is the number of clusters
-    # max_iter is the maximum number of iterations
+    # max_iter is the maximum number of iterations, if NULL, then no limit
     d <- ncol(data)
     centroids <- kmeans_init(d, k)
-    for (i in 1:max_iter) {
+    centroids2 <- list()
+    i <- 0
+    while (centroids != centroids2 || (max_iter != NULL && i < max_iter)) {
+        i <- i + 1
         assignments <- kmeans_assign(data, centroids)
+        centroids2 <- centroids
         centroids <- kmeans_update(data, centroids, assignments)
     }
     return(centroids)
