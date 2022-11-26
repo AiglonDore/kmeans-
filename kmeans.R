@@ -1,13 +1,8 @@
 # Step 1
 kmeans_init <- function(d, k) {
-    # d is the dimension
+    # d is the inumber of elements
     # k is the number of clusters
-    output <- list(floor(runif(n = d, min = 0, max = 100)))
-    for (i in 2:k) {
-        x <- floor(runif(n = d, min = 0, max = 100))
-        x <- list(x)
-        output <- append(output, x)
-    }
+    output <- list(floor(runif(n = k, min = 0, max = (d - 1))))
     return(output)
 }
 
@@ -47,8 +42,12 @@ kmeans <- function(data, k, max_iter = NULL) {
     # data is the data set
     # k is the number of clusters
     # max_iter is the maximum number of iterations, if NULL, then no limit
-    d <- ncol(data)
-    centroids <- kmeans_init(d, k)
+    d <- nrow(data)
+    index <- kmeans_init(d, k)
+    centroids <- list()
+    for (i in 1:(length(index) - 1)) {
+        centroids <- append(centroids, data[index[[i]], ])
+    }
     centroids2 <- list()
     i <- 0
     while (centroids != centroids2 || (max_iter != NULL && i < max_iter)) {
