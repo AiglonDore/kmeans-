@@ -20,7 +20,7 @@ kmeansplusplus_init <- function(d, k) {
         }
         # We choose the next centroid, proportionally to the distance
         # to the closest centroid
-        x <- floor(runif(n = d, min = 0, max = 100))
+        x <- sample(x = 1:d, size = 1, prob = dist / sum(dist))
         x <- list(x)
         output <- append(output, x)
     }
