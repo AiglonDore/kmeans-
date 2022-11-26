@@ -1,13 +1,136 @@
 ---
-title: "Improved \(K\)-means algorithm"
+title: "Improved \\(K\\)-means algorithm"
 author: "Houda Aiboud Benchekroun and Thomas Roiseux"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
 \rule{\linewidth}{0.1pt}
 \part{Improved algorithm}
+\section{Regular algorithm}
+Before writing the improved \(K\)-means, we just want to make a quick reminder on the regular one:
+```{r kmeans}
+# Step 1
+kmeans_init <- function(d, k) {
+    # d is the inumber of elements
+    # k is the number of clusters
+    output <- list(floor(runif(n = k, min = 0, max = (d - 1))))
+    return(output)
+}
 
+# Step 2
+kmeans_assign <- function(data, centroids) {
+    # data is the data set
+    # centroids is the list of centroids
+    output <- list()
+    for (i in 1:(length(centroids) - 1)) {
+        x <- data[i, ]
+        dist <- list()
+        for (j in 1:(length(centroids) - 1)) {
+            y <- centroids[[j]]
+            dist <- append(dist, sqrt(sum((x - y)^2)))
+        }
+        output <- append(output, which.min(dist))
+    }
+    return(output)
+}
+
+# Step 3
+kmeans_update <- function(data, centroids, assignments) {
+    # data is the data set
+    # centroids is the list of centroids
+    # assignments is the list of assignments
+    output <- list()
+    for (i in 1:(length(centroids) - 1)) {
+        x <- data[assignments == i]
+        output <- append(output, colMeans(x))
+    }
+    return(output)
+}
+
+# Complete algorithm
+
+kmeans <- function(data, k, max_iter = NULL) {
+    # data is the data set
+    # k is the number of clusters
+    # max_iter is the maximum number of iterations, if NULL, then no limit
+    d <- length(data)
+    index <- kmeans_init(d, k)
+    centroids <- list()
+    for (i in 1:(length(index) - 1)) {
+        centroids <- append(centroids, data[index[[i]], ])
+    }
+    centroids2 <- list()
+    i <- 0
+    while (centroids != centroids2 || (!is.null(max_iter) && i < max_iter)) {
+        i <- i + 1
+        assignments <- kmeans_assign(data, centroids)
+        centroids2 <- centroids
+        centroids <- kmeans_update(data, centroids, assignments)
+    }
+    return(centroids)
+}
+
+```
+On this base, we are now going to only rewrite the initialization of this algorithm, as the other parts remain the same in the improved one:
+```{r kmeanspp}
+# Step 1
+kmeansplusplus_init <- function(d, k) {
+    # d is the dimension
+    # k is the number of clusters
+    output <- list()
+    # First centroid is chosen randomly
+    x <- floor(runif(n = 1, min = 0, max = (d - 1)))
+    output <- append(output, x)
+    for (i in 2:k) {
+        # For each centroid, we compute the distance to the closest centroid
+        dist <- list()
+        for (j in 1:(length(output) - 1)) {
+            y <- output[[j]]
+            dist <- append(dist, sqrt(sum((x - y)^2)))
+        }
+        # We choose the next centroid, proportionally to the distance
+        # to the closest centroid
+        x <- sample(x = 1:d, size = 1, prob = dist / sum(dist))
+        x <- list(x)
+        output <- append(output, x)
+    }
+    return(output)
+}
+
+# Complete algorithm
+
+kmeansplusplus <- function(data, k, max_iter = NULL) {
+    # data is the data set
+    # k is the number of clusters
+    # max_iter is the maximum number of iterations, if NULL, then no limit
+    d <- length(data)
+    index <- kmeansplusplus_init(d, k)
+    centroids <- list()
+    for (i in 1:(length(index) - 1)) {
+        centroids <- append(centroids, data[index[[i]], ])
+    }
+    centroids2 <- list()
+    i <- 0
+    while (centroids != centroids2 || (!is.null(max_iter) && i < max_iter)) {
+        i <- i + 1
+        assignments <- kmeans_assign(data, centroids)
+        centroids2 <- centroids
+        centroids <- kmeans_update(data, centroids, assignments)
+    }
+    return(centroids)
+}
+```
+\section{Generation of test samples}
+```{r samples}
+NORM10 <- runif(n = 10, min = 0, max = 500) + rnorm(10)
+NORM25 <- runif(n = 25, min = 0, max = 500) + rnorm(25)
+print(NORM10)
+print(NORM25)
+print(kmeans(as.data.frame(NORM10), 3))
+print(kmeansplusplus(as.data.fdrame(NORM10), 3))
+```
+We are now going to use these data set to test our algorithms.
 \part{Application to iris data}
-```{r loadiris}
+```{r loadiris, echo = FALSE, results='hide'}
 library(dplyr)
 ```
