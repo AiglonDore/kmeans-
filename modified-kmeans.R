@@ -4,12 +4,12 @@ source(file = "kmeans.R")
 # Only the first step will be reimplemented.
 
 # Step 1
-kmeansplusplus_init <- function(d, k){
+kmeansplusplus_init <- function(d, k) {
     # d is the dimension
     # k is the number of clusters
     output <- list()
     # First centroid is chosen randomly
-    x <- floor(runif(n = d, min = 0, max = 100))
+    x <- floor(runif(n = 1, min = 0, max = (d - 1)))
     output <- append(output, x)
     for (i in 2:k) {
         # For each centroid, we compute the distance to the closest centroid
@@ -19,19 +19,26 @@ kmeansplusplus_init <- function(d, k){
             dist <- append(dist, sqrt(sum((x - y)^2)))
         }
         # We choose the next centroid, proportionally to the distance
-        #x <- floor(runif(n = d, min = 0, max = 100, prob = dist))
+        # to the closest centroid
+        x <- floor(runif(n = d, min = 0, max = 100))
         x <- list(x)
         output <- append(output, x)
     }
     return(output)
 }
 
+# Complete algorithm
+
 kmeansplusplus <- function(data, k, max_iter = NULL) {
     # data is the data set
     # k is the number of clusters
     # max_iter is the maximum number of iterations, if NULL, then no limit
-    d <- ncol(data)
-    centroids <- kmeansplusplus_init(d, k)
+    d <- nrow(data)
+    index <- kmeansplusplus_init(d, k)
+    centroids <- list()
+    for (i in 1:(length(index) - 1)) {
+        centroids <- append(centroids, data[index[[i]], ])
+    }
     centroids2 <- list()
     i <- 0
     while (centroids != centroids2 || (max_iter != NULL && i < max_iter)) {
