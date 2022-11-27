@@ -1,20 +1,18 @@
-# Step 1
+#Step 1
+
 kmeans_init <- function(d, k) {
-    # d is the inumber of elements
-    # k is the number of clusters
     output <- list(floor(runif(n = k, min = 0, max = (d - 1))))
     return(output)
 }
 
-# Step 2
+#Step 2
+
 kmeans_assign <- function(data, centroids) {
-    # data is the data set
-    # centroids is the list of centroids
     output <- list()
-    for (i in 1:(length(centroids) - 1)) {
-        x <- data[i, ]
+    for (i in 1:(length(centroids))) {
+        x <- data[, i]
         dist <- list()
-        for (j in 1:(length(centroids) - 1)) {
+        for (j in 1:(length(centroids))) {
             y <- centroids[[j]]
             dist <- append(dist, sqrt(sum((x - y)^2)))
         }
@@ -23,34 +21,43 @@ kmeans_assign <- function(data, centroids) {
     return(output)
 }
 
-# Step 3
+#Step 3
+
 kmeans_update <- function(data, centroids, assignments) {
-    # data is the data set
-    # centroids is the list of centroids
-    # assignments is the list of assignments
     output <- list()
-    for (i in 1:(length(centroids) - 1)) {
-        x <- data[assignments == i, ]
+    for (i in 1:(length(centroids))) {
+        x <- data[, assignments == i]
         output <- append(output, colMeans(x))
     }
     return(output)
 }
 
-# Complete algorithm
+#Auxilary function
+
+compare_lists <- function(a, b) {
+    if (length(a) != length(b)) {
+        return(FALSE)
+    }
+    for (i in 1:length(a)) {
+        if (a[[i]] != b[[i]]) {
+            return(FALSE)
+        }
+    }
+    return(TRUE)
+}
+
+#Complete algorithm
 
 kmeans <- function(data, k, max_iter = NULL) {
-    # data is the data set
-    # k is the number of clusters
-    # max_iter is the maximum number of iterations, if NULL, then no limit
-    d <- length(data)
+    d <- ncol(data)
     index <- kmeans_init(d, k)
     centroids <- list()
-    for (i in 1:(length(index) - 1)) {
-        centroids <- append(centroids, data[index[[i]], ])
+    for (i in 1:(length(index))) {
+        centroids <- append(centroids, data[, index[[i]]])
     }
     centroids2 <- list()
     i <- 0
-    while (centroids != centroids2 || (!is.null(max_iter) && i < max_iter)) {
+    while (compare_lists(centroids, centroids2) || (!is.null(max_iter) && i < max_iter)) {
         i <- i + 1
         assignments <- kmeans_assign(data, centroids)
         centroids2 <- centroids
