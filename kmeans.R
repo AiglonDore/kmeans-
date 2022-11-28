@@ -1,11 +1,7 @@
-#Step 1
-
 kmeans_init <- function(d, k) {
     output <- list(floor(runif(n = k, min = 0, max = (d - 1))))
     return(output)
 }
-
-#Step 2
 
 kmeans_assign <- function(data, centroids) {
     output <- list()
@@ -21,8 +17,6 @@ kmeans_assign <- function(data, centroids) {
     return(output)
 }
 
-#Step 3
-
 kmeans_update <- function(data, centroids, assignments) {
     output <- list()
     for (i in 1:(length(centroids))) {
@@ -31,8 +25,6 @@ kmeans_update <- function(data, centroids, assignments) {
     }
     return(output)
 }
-
-#Auxilary function
 
 compare_lists <- function(a, b) {
     if (length(a) != length(b)) {
@@ -45,8 +37,6 @@ compare_lists <- function(a, b) {
     }
     return(TRUE)
 }
-
-#Complete algorithm
 
 kmeans <- function(data, k, max_iter = NULL) {
     d <- ncol(data)
