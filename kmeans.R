@@ -6,7 +6,7 @@ kmeans_init <- function(d, k) {
 kmeans_assign <- function(data, centroids) {
     output <- list()
     for (i in 1:(length(centroids))) {
-        x <- data[, i]
+        x <- data[i,]
         dist <- list()
         for (j in 1:(length(centroids))) {
             y <- centroids[[j]]
@@ -20,7 +20,7 @@ kmeans_assign <- function(data, centroids) {
 kmeans_update <- function(data, centroids, assignments) {
     output <- list()
     for (i in 1:(length(centroids))) {
-        x <- data[, assignments == i]
+        x <- data[assignments == i,]
         output <- append(output, colMeans(x))
     }
     return(output)
@@ -39,11 +39,11 @@ compare_lists <- function(a, b) {
 }
 
 kmeans <- function(data, k, max_iter = NULL) {
-    d <- ncol(data)
+    d <- nrow(data)
     index <- kmeans_init(d, k)
     centroids <- list()
     for (i in 1:(length(index))) {
-        centroids <- append(centroids, data[, index[[i]]])
+        centroids <- append(centroids, data[index[[i]], ])
     }
     centroids2 <- list()
     i <- 0
