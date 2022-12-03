@@ -33,19 +33,19 @@ kmeansplusplus <- function(data, k, max_iter = NULL) {
     # data is the data set
     # k is the number of clusters
     # max_iter is the maximum number of iterations, if NULL, then no limit
-    d <- nrow(data)
-    index <- kmeansplusplus_init(d, k)
-    centroids <- list()
-    for (i in 1:(length(index) - 1)) {
-        centroids <- append(centroids, data[index[[i]], ])
-    }
-    centroids2 <- list()
-    i <- 0
-    while (centroids != centroids2 || (!is.null(max_iter) && i < max_iter)) {
-        i <- i + 1
-        assignments <- kmeans_assign(data, centroids)
-        centroids2 <- centroids
-        centroids <- kmeans_update(data, centroids, assignments)
-    }
-    return(centroids)
+        d <- ncol(data)
+        index <- kmeansplusplus_init(d, k)
+        centroids <- list()
+        for (i in 1:(length(index))) {
+            centroids <- append(centroids, data[, index[[i]]])
+        }
+        centroids2 <- list()
+        i <- 0
+        while (compare_lists(centroids, centroids2) || (!is.null(max_iter) && i < max_iter)) {
+            i <- i + 1
+            assignments <- kmeans_assign(data, centroids)
+            centroids2 <- centroids
+            centroids <- kmeans_update(data, centroids, assignments)
+        }
+        return(centroids)
 }
