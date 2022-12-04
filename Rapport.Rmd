@@ -26,17 +26,65 @@ First, let's see what is this dataset.
 names(iris)
 summary(iris)
 head(iris)
+tail(iris)
 plot(iris)
 ```
 We can notice some linear correlation between the length and the width of the petals.
+Also, regarding the variable names, we can guess that the \texttt{Species} variable will be qualitative.
+```{r corrmat}
+library(corrplot)
+cormat <- cor(iris[, -5])#Removing species for correlation
+corrplot(cormat)
+```
+The correlation matrix shows that we have strong correlation
+between the width of sepals and petals, and the same for the petals.
 \section{Algorithm comparizon}
 ```{r algos_comp}
 library(mclust)
 Mclust(iris)
 ```
 \section{Primary component analysis}
+Primary component analysis requires to have only quantitative variables in our data set.
+However, as the \texttt{iris} data set, has a column \texttt{Species} that is qualitative (it describes gives the name of the considered iris species), we will first drop this column and then perform on only the remaining variables.
 ```{r pca}
 library(FactoMineR)
 library(factoextra)
-#PCA(iris, scale.unit = TRUE, ncp = 5, graph = TRUE)
+df <- iris[, !(names(iris) %in% c("Species"))]
+pca <- PCA(df, scale.unit = TRUE, ncp = 5, graph = FALSE)
+fviz_pca_ind(pca, geom.ind = "point",col.ind = iris$Species,
+             palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+             addEllipses = TRUE,
+             legend.title = "Groups"
+)
+fviz_pca_ind(pca, geom.ind = "point",col.ind = iris$Species,
+             palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+             addEllipses = TRUE,
+             legend.title = "Groups",
+             axes = c(3,4)
+)
+```
+
+We now have the individual graphs. We therefore notice that, even is the \texttt{Species} is qualitative,
+all observations are grouped by species. They seems to share common values regarding their sepals.\par
+But this distinction is not that marked for the petals: irises seems to have more common aspects, regarding the population ellipses, even if their species are different.
+
+```{r corcercle}
+fviz_pca_var(pca)
+fviz_pca_var(pca, axes = c(3,4))
+variables <- get_pca_var(pca)
+head(variables$coord)
+head(variables$cos2)
+corrplot(variables$cos2, is.corr = FALSE)
+```
+
+Using this correlation plot, we notice that
+
+```{r contrib}
+fviz_pca_var(pca, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+fviz_eig(pca, addlabels = TRUE)
+fviz_contrib(pca, choice = "var")
+fviz_contrib(pca, choice = "var", axes = 2)
+fviz_contrib(pca, choice = "var", axes = 3)
+fviz_contrib(pca, choice = "var", axes = 4)
 ```
