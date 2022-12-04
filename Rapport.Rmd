@@ -14,10 +14,29 @@ On this base, we are now going to only rewrite the initialization of this algori
 ```{r kmeanspp, code = readLines("modified-kmeans.R")}
 ```
 \section{Generation of test samples}
+We are now going to use these data set to test our algorithms.
 ```{r samples, code = readLines("simulation.R")}
 ```
-We are now going to use these data set to test our algorithms.
+
+\clearpage
 \part{Application to iris data}
-```{r loadiris, echo = FALSE, results = 'hide'}
-library(dplyr)
+\section{Preview of the data}
+First, let's see what is this dataset.
+```{r loadiris}
+names(iris)
+summary(iris)
+head(iris)
+plot(iris)
+```
+We can notice some linear correlation between the length and the width of the petals.
+\section{Algorithm comparizon}
+```{r algos_comp}
+library(mclust)
+Mclust(iris)
+```
+\section{Primary component analysis}
+```{r pca}
+library(FactoMineR)
+library(factoextra)
+#PCA(iris, scale.unit = TRUE, ncp = 5, graph = TRUE)
 ```

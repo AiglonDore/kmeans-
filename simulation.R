@@ -20,9 +20,48 @@ generate_sets <- function(n, nbcenters, dim = 5){
 generate_norms <- function(n, nbcenters, dim = 5){
     x <- generate_sets(n, nbcenters ,dim)
     m <- matrix(unlist(x), ncol = dim)
-    df <- as.data.frame(m)
-    return(df)
+    return(m)
 }
 
-NORM10 <-generate_norms(1000, 10, 5)
-NORM25 <-generate_norms(1000, 25, 5)
+if (!exists("NORM10")){
+    NORM10 <-generate_norms(1000, 10, 5)
+}
+if (!exists("NORM25")){
+    NORM25 <-generate_norms(1000, 25, 5)
+}
+
+#Kmeans
+
+for (k in c(10,25,50)){
+    weight_kmeans10 <- list()
+    weight_kmeans25 <- list()
+    weight_kmeans10pp <- list()
+    weight_kmeans25pp <- list()
+    for (i in 1:20){
+        means10 <- unlist(kmeans(data = NORM10, k))
+        means25 <- unlist(kmeans(data = NORM25, k))
+        #means10pp <- unlist(kmeansplusplus(data = NORM10, k))
+        #means25pp <- unlist(kmeansplusplus(data = NORM25, k))
+        
+        centroids10 <- matrix(means10, ncol = 5)
+        centroids25 <- matrix(means25, ncol = 5)
+        #centroids10pp <- matrix(means10, ncol = 5)
+        #centroids25pp <- matrix(means25, ncol = 5)
+        
+        weight_kmeans10 <- append(weight_kmeans10, phi(NORM10, centroids10))
+        weight_kmeans25 <- append(weight_kmeans25, phi(NORM25, centroids25))
+        #weight_kmeans10pp <- append(weight_kmeans10pp, phi(NORM10, centroids10))
+        #weight_kmeans25pp <- append(weight_kmeans25pp, phi(NORM25, centroids25))
+    }
+    print(paste("k = ", k))
+    print("K-means")
+    print(paste("Average cost (10): ", mean(unlist(weight_kmeans10))))
+    print(paste("Average cost (25): ", mean(unlist(weight_kmeans25))))
+    print(paste("Minimum cost (10): ", min(unlist(weight_kmeans10))))
+    print(paste("Minimum cost (25): ", min(unlist(weight_kmeans25))))
+    print("K-means++")
+    #print(paste("Average cost (10): ", mean(unlist(weight_kmeans10pp))))
+    #print(paste("Average cost (25): ", mean(unlist(weight_kmeans25pp))))
+    #print(paste("Minimum cost (10): ", min(unlist(weight_kmeans10pp))))
+    #print(paste("Minimum cost (25): ", min(unlist(weight_kmeans25pp))))
+}

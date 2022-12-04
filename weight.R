@@ -1,9 +1,9 @@
 phi <- function(points, centroids){
     s <- 0
-    for (p in points){
+    for (i in nrow(points)){
         norms <- list()
-        for (c in centroids){
-            norms <- append(norms, norm(p - c, type = "2") * norm(p - c, type = "2"))
+        for (j in nrow(centroids)){
+            norms <- append(norms, norm(points[i, ] - centroids[j, ], type = "2") ^ 2)
         }
         s <- s + min(unlist(norms))
     }

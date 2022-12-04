@@ -14,13 +14,14 @@ kmeansplusplus_init <- function(d, k) {
     for (i in 2:k) {
         # For each centroid, we compute the distance to the closest centroid
         dist <- list()
-        for (j in 1:(length(output) - 1)) {
+        for (j in 1:(length(output))) {
             y <- output[[j]]
             dist <- append(dist, sqrt(sum((x - y)^2)))
         }
         # We choose the next centroid, proportionally to the distance
         # to the closest centroid
-        x <- sample(x = 1:d, size = 1, prob = dist / sum(dist))
+        print(length(unlist(dist)))
+        x <- sample(x = 1:d, size = 1, prob = unlist(dist) / sum(unlist(dist)))
         x <- list(x)
         output <- append(output, x)
     }
@@ -37,7 +38,7 @@ kmeansplusplus <- function(data, k, max_iter = NULL) {
         index <- kmeansplusplus_init(d, k)
         centroids <- list()
         for (i in 1:(length(index))) {
-            centroids <- append(centroids, data[, index[[i]]])
+            centroids <- append(centroids, data[index[[i]], ])
         }
         centroids2 <- list()
         i <- 0
