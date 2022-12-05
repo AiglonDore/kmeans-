@@ -56,35 +56,23 @@ fviz_pca_ind(pca, geom.ind = "point",col.ind = iris$Species,
              addEllipses = TRUE,
              legend.title = "Groups"
 )
-fviz_pca_ind(pca, geom.ind = "point",col.ind = iris$Species,
-             palette = c("#00AFBB", "#E7B800", "#FC4E07"),
-             addEllipses = TRUE,
-             legend.title = "Groups",
-             axes = c(3,4)
-)
 ```
 
 We now have the individual graphs. We therefore notice that, even is the \texttt{Species} is qualitative,
-all observations are grouped by species. They seems to share common values regarding their sepals.\par
-But this distinction is not that marked for the petals: irises seems to have more common aspects, regarding the population ellipses, even if their species are different.
+all observations are grouped by species.
 
 ```{r corcercle}
-fviz_pca_var(pca)
-fviz_pca_var(pca, axes = c(3,4))
+fviz_pca_var(pca, col.var = "contrib", repel = TRUE,
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 variables <- get_pca_var(pca)
-head(variables$coord)
-head(variables$cos2)
+head(variables$contrib)
 corrplot(variables$cos2, is.corr = FALSE)
 ```
 
-Using this correlation plot, we notice that
-
-```{r contrib}
-fviz_pca_var(pca, col.var = "contrib",
-             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
-fviz_eig(pca, addlabels = TRUE)
-fviz_contrib(pca, choice = "var")
-fviz_contrib(pca, choice = "var", axes = 2)
-fviz_contrib(pca, choice = "var", axes = 3)
-fviz_contrib(pca, choice = "var", axes = 4)
-```
+With the correlation circles, we know how the original variables are correlated with the new ones:
+these new variables are made with linear combination of the original ones.
+Therefore, using the previous circle and the contribution table, we have two principal components:
+\begin{enumerate}
+\item The first primary component, here named \texttt{Dim1} holds mainly all the data of the petals, which can be interpreted as the petals surface
+\item The second primary component, here named \texttt{Dim2} is mostly made of the width and the length of the sepals. This can be the sepals surface.
+\end{enumerate}
