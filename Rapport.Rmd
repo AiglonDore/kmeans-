@@ -41,8 +41,12 @@ between the width of sepals and petals, and the same for the petals.
 \section{Algorithm comparizon}
 ```{r algos_comp}
 library(mclust)
-Mclust(iris)
+stats::kmeans(iris[-c(5)], centers = 10)
+mclust.res <- Mclust(iris[-c(5)])
+print(mclust.res$classification)
+print(mclust.res$parameters)
 ```
+We here notice that the \texttt{Mclust} algorithm made only two clusters for this dataset.
 \section{Primary component analysis}
 Primary component analysis requires to have only quantitative variables in our data set.
 However, as the \texttt{iris} data set, has a column \texttt{Species} that is qualitative (it describes gives the name of the considered iris species), we will first drop this column and then perform on only the remaining variables.

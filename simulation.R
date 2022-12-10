@@ -38,8 +38,8 @@ for (k in c(10,25,50)){
     weight_kmeans10pp <- list()
     weight_kmeans25pp <- list()
     for (i in 1:20){
-        means10 <- unlist(kmeans(data = NORM10, k))
-        means25 <- unlist(kmeans(data = NORM25, k))
+        means10 <- unlist(stats::kmeans(NORM10, k))
+        means25 <- unlist(stats::kmeans(NORM25, k))
         #means10pp <- unlist(kmeansplusplus(data = NORM10, k))
         #means25pp <- unlist(kmeansplusplus(data = NORM25, k))
         
