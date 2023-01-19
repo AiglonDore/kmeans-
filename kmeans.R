@@ -38,7 +38,7 @@ compare_lists <- function(a, b) {
     return(TRUE)
 }
 
-kmeans <- function(data, k, max_iter = NULL) {
+pkmeans <- function(data, k, max_iter = NULL) {
     d <- nrow(data)
     index <- kmeans_init(d, k)
     centroids <- list()

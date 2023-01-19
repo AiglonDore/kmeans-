@@ -10,12 +10,15 @@ output: pdf_document
 Before writing the improved \(K\)-means, we just want to make a quick reminder on the regular one:
 ```{r kmeans, code = readLines("kmeans.R")}
 ```
+Questioning the performance, we will use the integrated \texttt{R} function to perform computations.
 On this base, we are now going to only rewrite the initialization of this algorithm, as the other parts remain the same in the improved one:
 ```{r kmeanspp, code = readLines("modified-kmeans.R")}
 ```
+
+As we can pass a list of centers to the \texttt{kmeans} function, we will use this function too.
 \section{Generation of test samples}
 We are now going to use these data set to test our algorithms.
-```{r samples, code = readLines("simulation.R")}
+```{r samples, code = readLines("simulation.R"), eval = FALSE}
 ```
 
 \clearpage
@@ -40,8 +43,20 @@ The correlation matrix shows that we have strong correlation
 between the width of sepals and petals, and the same for the petals.
 \section{Algorithm comparizon}
 ```{r algos_comp}
+data(iris)
+result <- kmeansplusplus(iris[-c(5)], 3)
+cluster <- as.factor(result$cluster)
+centers <- as.data.frame(result$centers)
+library(ggplot2)
+ggplot(iris, aes(x=Petal.Length, y=Petal.Width, color=cluster)) + geom_point() +
+    geom_point(data=centers, color='coral',size=4,pch=21)+ geom_point(data=centers, color='coral',size=50,alpha=0.2)
 library(mclust)
-stats::kmeans(iris[-c(5)], centers = 10)
+result <- stats::kmeans(iris[-c(5)], centers = 3)
+cluster <- as.factor(result$cluster)
+centers <- as.data.frame(result$centers)
+library(ggplot2)
+ggplot(iris, aes(x=Petal.Length, y=Petal.Width, color=cluster)) + geom_point() +
+    geom_point(data=centers, color='coral',size=4,pch=21)+ geom_point(data=centers, color='coral',size=50,alpha=0.2)
 mclust.res <- Mclust(iris[-c(5)])
 print(mclust.res$classification)
 print(mclust.res$parameters)
@@ -70,6 +85,7 @@ fviz_pca_var(pca, col.var = "contrib", repel = TRUE,
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
 variables <- get_pca_var(pca)
 head(variables$contrib)
+head(variables$cos2)
 corrplot(variables$cos2, is.corr = FALSE)
 ```
 
@@ -77,6 +93,28 @@ With the correlation circles, we know how the original variables are correlated 
 these new variables are made with linear combination of the original ones.
 Therefore, using the previous circle and the contribution table, we have two principal components:
 \begin{enumerate}
-\item The first primary component, here named \texttt{Dim1} holds mainly all the data of the petals, which can be interpreted as the petals surface
-\item The second primary component, here named \texttt{Dim2} is mostly made of the width and the length of the sepals. This can be the sepals surface.
+\item The first primary component, here named \texttt{Dim1}, which is mostly made of the petal variables and the length of the sepals.
+\item The second primary component, here named \texttt{Dim2}, is made of the width of the sepals.
+\item As these two dimensions hold more than 95\,\% of the data information, it is not required to consider the other planes, as they will not provide enough information.
 \end{enumerate}
+But, using the correlation circles, we notice that we have a dimension that holds 73\,\% of the information.
+Therefore, we are going to divide our data frame by the most correlated variable:
+```{r pca2}
+df <- iris[, !(names(iris) %in% c("Species"))] / iris$Petal.Length
+df$Petal.Length <- NULL
+pca <- PCA(df, scale.unit = TRUE, ncp = 5, graph = FALSE)
+fviz_pca_ind(pca, geom.ind = "point",col.ind = iris$Species,
+             palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+             addEllipses = TRUE,
+             legend.title = "Groups"
+)
+fviz_pca_var(pca, col.var = "contrib", repel = TRUE,
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"))
+variables <- get_pca_var(pca)
+head(variables$contrib)
+head(variables$cos2)
+corrplot(variables$cos2, is.corr = FALSE)
+```
+
+After dividing, we now have new variables, but the first dimension holds now nearly 92\,\% of the information.
+However, this doesn't change the correlation between old and new variables.

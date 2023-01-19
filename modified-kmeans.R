@@ -1,52 +1,31 @@
-source(file = "kmeans.R")
-
-# We are going to only reimplement some steps, not the whole algorithm
-# Only the first step will be reimplemented.
-
 # Step 1
-kmeansplusplus_init <- function(d, k) {
-    # d is the dimension
+kmeansplusplus_init <- function(data, k) {
     # k is the number of clusters
-    output <- list()
-    # First centroid is chosen randomly
-    x <- floor(runif(n = 1, min = 0, max = (d - 1)))
-    output <- append(output, x)
-    for (i in 2:k) {
-        # For each centroid, we compute the distance to the closest centroid
-        dist <- list()
-        for (j in 1:(length(output))) {
-            y <- output[[j]]
-            dist <- append(dist, sqrt(sum((x - y)^2)))
+    dim <- nrow(data)
+    output = list()
+    x <- runif(n = 1, min = 1, max = dim)
+    output <- append(output, list(data[x,]))
+    distance.matrix <- as.matrix(dist(data))
+    for (i in 2:k) { # k clusters
+        distList <- list()
+        for (j in 1:dim) { # Distances from point to closest center
+            dists = list()
+            for (k in 1:length(output)) { #Distances from point to centers
+                dist <- distance.matrix[j,k]
+                dists <- append(dists, dist)
+            } 
+            distList <- append(distList, min(unlist(dists)))
         }
-        # We choose the next centroid, proportionally to the distance
-        # to the closest centroid
-        print(length(unlist(dist)))
-        x <- sample(x = 1:d, size = 1, prob = unlist(dist) / sum(unlist(dist)))
-        x <- list(x)
-        output <- append(output, x)
+        
+        x <- sample(x = 1:dim, size = 1, prob = unlist(distList) / sum(unlist(distList))) #If an element is already chose, then its distance will be 0 so it can't be chosen again.
+        output <- append(output, list(data[x, ]))
     }
     return(output)
 }
 
 # Complete algorithm
-
-kmeansplusplus <- function(data, k, max_iter = NULL) {
-    # data is the data set
-    # k is the number of clusters
-    # max_iter is the maximum number of iterations, if NULL, then no limit
-        d <- ncol(data)
-        index <- kmeansplusplus_init(d, k)
-        centroids <- list()
-        for (i in 1:(length(index))) {
-            centroids <- append(centroids, data[index[[i]], ])
-        }
-        centroids2 <- list()
-        i <- 0
-        while (compare_lists(centroids, centroids2) || (!is.null(max_iter) && i < max_iter)) {
-            i <- i + 1
-            assignments <- kmeans_assign(data, centroids)
-            centroids2 <- centroids
-            centroids <- kmeans_update(data, centroids, assignments)
-        }
-        return(centroids)
+kmeansplusplus <- function(data, k){
+    centers <- kmeansplusplus_init(data, k)
+    df <- as.data.frame(matrix(unlist(centers), ncol = ncol(data), byrow = TRUE))
+    return(kmeans(data, df))
 }
